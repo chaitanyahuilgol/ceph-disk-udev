@@ -1,0 +1,18 @@
+#
+# Part Type/UUID are not available at DM layer, also dm-* devices are
+# ignored by partuuid and parttypeuuid link scretion udev rules 
+# Following is a workaround, ceph-disk with mpath-activate
+# ceph-disk checks the part Type and takes further action
+#
+
+KERNEL!="dm-*", GOTO="ceph_mpath_end"
+ACTION!="add", GOTO="ceph_mpath_end"
+
+ENV{DM_TABLE_STATE}!="LIVE", GOTO="ceph_mpath_end"
+
+# Create persistent links for partitions
+ENV{DM_UUID}=="*-mpath-*", \
+ENV{DM_PART}=="?*", \
+    RUN+="/usr/sbin/ceph-disk-mpath-activate /dev/$name"
+
+LABEL="ceph_mpath_end"

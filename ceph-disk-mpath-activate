@@ -1,0 +1,15 @@
+#!/bin/bash
+
+mkdir -p /tmp/mpath-log
+DM=`basename $1`
+LOG=${DM}.$$.`date  +%H-%M-%S_%F`.log
+LOG=/tmp/mpath-log/${LOG}
+date > $LOG
+echo "Mpath Activate $*" >> $LOG
+
+dir=`dirname $0`
+$dir/ceph-disk -v mpath_activate $*  2>>$LOG
+echo "ceph-disk status $?" >> $LOG
+
+gzip $LOG
+exit 0
