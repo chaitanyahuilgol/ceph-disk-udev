@@ -1721,30 +1721,23 @@ SizeMB is returned assuming hw sectors size aligns 1MB
 def get_largest_free_part_size(dev, sect_size):
 
     out, ret = command(['sgdisk', '--first-aligned-in-largest', dev])
-    if ret:
+    if 'invalid GPT' in out or ret != 0:
         return None
+
     start = out.split('\n', 1)[0]
+
     out, ret = command(['sgdisk', '--end-of-largest', dev])
-    if ret:
+    if 'invalid GPT' in out or ret != 0:
         return None
 
     end = out.split('\n', 1)[0]
-    size = long(end) - long(start)
-    sizeMB = (size * sect_size)/(1024 * 1024)
+    if start and end:
+        size = long(end) - long(start)
+        sizeMB = (size * sect_size)/(1048576)
+    else:
+        sizeMB = 0 
 
     return sizeMB
-
-    udevCtx = pyudev.Context()
-    device  = pyudev.Device.from_device_file(udevCtx, dev)
-    sysNode = device.get('DEVPATH')
-    if sysNode:
-        sectSizePath = os.path.join(sysNode, 'queue')
-        sectSizePath = '/sys' + sectSizePath
-        sectSizeStr = read_one_line(sectSizePath, 'hw_sector_size')
-        if sectSizeStr:
-            return sizeMB
-
-    return None
 
 def get_free_partition_index(dev):
     """
