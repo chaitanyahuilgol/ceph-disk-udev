@@ -1,0 +1,118 @@
+==================================================================
+openSUSE 13.2 (Harlequin) (x86_64)
+==================================================================
+----------------------------
+Generic Block Base Device
+----------------------------
+[PASS] Get Device Context
+[PASS] Get Device Node: /dev/sdb
+[PASS] Partition Test OK
+[PASS] No partition number as expected
+[PASS] Get Partition Dev: /dev/sdb1
+[PASS] Failed to get Base Device as expected
+[PASS] Get Part list OK on partition
+PART: sdb1
+[PASS] Failed to get part type as expected
+[PASS] Failed to get part UUID as expected
+Device has no holders
+Device Type is: generic-block-dev
+Hardware Sector Size is: 512
+Largest Free Partition Size in MB: 7166
+Journal SymLink is: /dev/disk/by-partuuid/9c9e1134-af8c-4cdb-9db6-d2646fc52340
+Completed with 0 Warnings and 0 Errors
+
+--------------------------------
+Generic Block Partition Device
+--------------------------------
+[PASS] Get Device Context
+[PASS] Get Device Node: /dev/sdb1
+[PASS] Partition Test OK
+[PASS] Partition Number is 1
+[PASS] Get Partition Dev Fails as expected
+[PASS] Base Device is: /dev/sdb
+[PASS] Get Part list Fails as expected
+[PASS] Part Type is: ad219d90-edab-453e-a75d-b5ec320e7ec0
+[PASS] Part UUID is: 2818d4c0-a8b9-4362-bb78-54833af376ce
+Device has no holders
+Device Type is: generic-block-dev
+Hardware Sector Size is: 512
+Journal SymLink is: /dev/disk/by-partuuid/9c9e1134-af8c-4cdb-9db6-d2646fc52340
+Completed with 0 Warnings and 0 Errors
+
+--------------------------------------------
+Generic Block Partition Device with Holder
+--------------------------------------------
+[PASS] Get Device Context
+[PASS] Get Device Node: /dev/sdb1
+[PASS] Partition Test OK
+[PASS] Partition Number is 1
+[PASS] Get Partition Dev Fails as expected
+[PASS] Base Device is: /dev/sdb
+[PASS] Get Part list Fails as expected
+[PASS] Part Type is: ad219d90-edab-453e-a75d-b5ec320e7ec0
+[PASS] Part UUID is: 2818d4c0-a8b9-4362-bb78-54833af376ce
+Print Holder list:
+[HOLDER] dm-0
+Device Type is: generic-block-dev
+Hardware Sector Size is: 512
+Journal SymLink is: /dev/disk/by-partuuid/9c9e1134-af8c-4cdb-9db6-d2646fc52340
+Completed with 0 Warnings and 0 Errors
+
+-----------------------------------------
+Multipath Base Device
+-----------------------------------------
+[PASS] Get Device Context
+[PASS] Get Device Node: /dev/dm-0
+[PASS] Partition Test OK
+[PASS] No partition number as expected
+[PASS] Get Partition Dev: /dev/dm-1
+[PASS] Failed to get Base Device as expected
+[PASS] Get Part list OK on partition
+PART: dm-1
+[PASS] Failed to get part type as expected
+[PASS] Failed to get part UUID as expected
+Device has no holders
+Device Type is: dm-multipath
+Hardware Sector Size is: 512
+Largest Free Partition Size in MB: 1022
+Journal SymLink is: /dev/mapper/353333330000007d0
+Completed with 0 Warnings and 0 Errors
+
+-------------------------------------------
+Multipath Partition Device
+-------------------------------------------
+
+[PASS] Get Device Context
+[PASS] Get Device Node: /dev/dm-1
+[PASS] Partition Test OK
+[PASS] Partition Number is 1
+[PASS] Get Partition Dev Fails as expected
+[PASS] Base Device is: /dev/dm-0
+[PASS] Get Part list Fails as expected
+[PASS] Part Type is: 30ea8853-4425-4906-954a-3098aeb1ef9c
+[PASS] Part UUID is: 4d2e6b58-8797-4a9d-8e35-8ef382d451f5
+Device has no holders
+Device Type is: dm-multipath
+Hardware Sector Size is: 512
+Journal SymLink is: /dev/mapper/353333330000007d0-part1
+Completed with 0 Warnings and 0 Errors
+
+-------------------------------------------
+Multipath Partition Device with holder
+-------------------------------------------
+ 
+[PASS] Get Device Context
+[PASS] Get Device Node: /dev/dm-1
+[PASS] Partition Test OK
+[PASS] Partition Number is 1
+[PASS] Get Partition Dev Fails as expected
+[PASS] Base Device is: /dev/dm-0
+[PASS] Get Part list Fails as expected
+[PASS] Part Type is: 30ea8853-4425-4906-954a-3098aeb1ef9c
+[PASS] Part UUID is: 4d2e6b58-8797-4a9d-8e35-8ef382d451f5
+Print Holder list:
+[HOLDER] dm-2
+Device Type is: dm-multipath
+Hardware Sector Size is: 512
+Journal SymLink is: /dev/mapper/353333330000007d0-part1
+Completed with 0 Warnings and 0 Errors
