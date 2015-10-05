@@ -676,8 +676,8 @@ class GenericBlockDev(BlockDevBase):
     """
     def get_partition_dev(self, SearchPartNum):
         for childDev in self.device.children:
-            partNum = int(childDev.get('ID_PART_ENTRY_NUMBER'))
-            if partNum is SearchPartNum:
+            partNum = childDev.get('ID_PART_ENTRY_NUMBER')
+            if partNum and int(partNum) is SearchPartNum:
                 return childDev.device_node
         return None
 
@@ -1721,13 +1721,13 @@ SizeMB is returned assuming hw sectors size aligns 1MB
 def get_largest_free_part_size(dev, sect_size):
 
     out, ret = command(['sgdisk', '--first-aligned-in-largest', dev])
-    if 'invalid GPT' in out or ret != 0:
+    if 'invalid GPT' in out or 'Creating new GPT entries' in out or ret != 0:
         return None
 
     start = out.split('\n', 1)[0]
 
     out, ret = command(['sgdisk', '--end-of-largest', dev])
-    if 'invalid GPT' in out or ret != 0:
+    if 'invalid GPT' in out or 'Creating new GPT entries' in out or ret != 0:
         return None
 
     end = out.split('\n', 1)[0]
