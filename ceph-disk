@@ -776,12 +776,18 @@ DM Device Class. Implements APIs for accessing properties of
 Device mapper devices
 ----------------------------------------------------------------------------
 """
+def get_dm_partition_num(device):
+    partNum = device.get('DM_PART')
+    if not partNum:
+        partNum = device.get('ID_PART_ENTRY_NUMBER')
+
+    return partNum
+
 class DMBlockDev(BlockDevBase):
 
     def __init__(self, udevCtx, device):
         self.udevCtx = udevCtx
         self.device  = device
-
 
     """
     Get Device node name
@@ -799,11 +805,10 @@ class DMBlockDev(BlockDevBase):
     Get partition Number
     """
     def get_partition_num(self):
-        partNum = self.device.get('DM_PART')
+        partNum = get_dm_partition_num(self.device)
         if partNum:
             return int(partNum)
-        else:
-            return None
+        return None
 
     """
     Check if the block device is a partition
@@ -823,19 +828,15 @@ class DMBlockDev(BlockDevBase):
     """
     def get_partition_dev(self, pnum):
         name = os.path.basename(self.device.device_node)
-        for f in os.listdir(os.path.join('/sys/block', name, 'holders')):
-            part = os.path.realpath(os.path.join('/sys/block', name, 'holders', f))
-            partDev = pyudev.Device.from_path(self.udevCtx, part)
+        for holder in os.listdir(os.path.join('/sys/block', name, 'holders')):
+            partDev = pyudev.Device.from_name(self.udevCtx, 'block', holder)
             partDevNum = None
             if partDev:
-                partDevProp = partDev.get('DM_PART')
-                if partDevProp:
-                    partDevNum = int(partDevProp)
+                partDevNum = get_dm_partition_num(partDev)
 
-            if partDevNum is pnum:
+            if partDevNum and int(partDevNum) is pnum:
                 return partDev.device_node
         return None
-
 
     """
     Get the underlying base device for a partition
@@ -846,9 +847,8 @@ class DMBlockDev(BlockDevBase):
         if self.is_partition():
             name = os.path.basename(self.device.device_node)
             myPartNum = self.get_partition_num()
-            for f in os.listdir(os.path.join('/sys/block', name, 'slaves')):
-                base = os.path.realpath(os.path.join('/sys/block', name, 'slaves', f))
-                baseDev = pyudev.Device.from_path(self.udevCtx, base)
+            for slave in os.listdir(os.path.join('/sys/block', name, 'slaves')):
+                baseDev = pyudev.Device.from_name(self.udevCtx, 'block', slave)
                 baseDevCtx = get_block_device_ctx(baseDev.device_node)
                 if baseDevCtx:
                     partName = baseDevCtx.get_partition_dev(myPartNum)
@@ -866,9 +866,8 @@ class DMBlockDev(BlockDevBase):
     def is_held(self):
         name = os.path.basename(self.device.device_node)
         holders = []
-        for f in os.listdir(os.path.join('/sys/block', name, 'holders')):
-            holder = os.path.realpath(os.path.join('/sys/block', name, 'holders', f))
-            holderDev = pyudev.Device.from_path(self.udevCtx, holder)
+        for holder in os.listdir(os.path.join('/sys/block', name, 'holders')):
+            holderDev = pyudev.Device.from_name(self.udevCtx, 'block', holder)
             devCtx = get_block_device_ctx(holderDev.device_node)
             if devCtx:
                 if not devCtx.is_partition():
@@ -882,9 +881,8 @@ class DMBlockDev(BlockDevBase):
     def list_partitions(self):
         name = os.path.basename(self.device.device_node)
         partitions = []
-        for f in os.listdir(os.path.join('/sys/block', name, 'holders')):
-            part = os.path.realpath(os.path.join('/sys/block', name, 'holders', f))
-            partDev = pyudev.Device.from_path(self.udevCtx, part)
+        for holder in os.listdir(os.path.join('/sys/block', name, 'holders')):
+            partDev = pyudev.Device.from_name(self.udevCtx, 'block', holder)
             devCtx = get_block_device_ctx(partDev.device_node)
             if devCtx:
                 if devCtx.is_partition():
@@ -1967,9 +1965,9 @@ def prepare_journal_dev(
         udev_settle()
 
         LOG.debug('Journal is GPT partition %s', journal_symlink)
-		#
-		# Check if the kernel/udev detected the change, if not then we need to probe
-		#
+        #
+        # Check if the kernel/udev detected the change, if not then we need to probe
+        #
         partdev = wait_partition(jrnlDevCtx, num, 8)
         if not partdev:
             LOG.info('Journal Partition device not auto-updated, probing now')
